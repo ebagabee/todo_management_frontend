@@ -1,40 +1,58 @@
-# todo-management-frontend (todo-management-frontend)
+# Todo Management Frontend (Quasar/Vue)
 
-A Quasar Project
+## Descrição
 
-## Install the dependencies
+Frontend do sistema de gerenciamento de tarefas desenvolvido com Quasar e Vue 3, proporcionando uma interface responsiva e intuitiva.
+
+## Requisitos
+
+- Node.js 18+
+- NPM
+- Quasar CLI
+- Vue 3
+- TypeScript
+
+## Instalação
+
+1. Clonar o repositório
+
 ```bash
-yarn
-# or
-npm install
+git clone https://github.com/ebagabee/todo_management_frontend.git
+cd todo_management_frontend
 ```
 
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
+2. Instalar dependências
+
 ```bash
-quasar dev
+yarn install
 ```
 
+3. Instalar Quasar CLI globalmente
 
-### Lint the files
 ```bash
-yarn lint
-# or
-npm run lint
+npm install -g @quasar/cli
 ```
 
+## Desenvolvimento
 
-### Format the files
+Iniciar servidor de desenvolvimento:
+
 ```bash
-yarn format
-# or
-npm run format
+yarn dev
+# Servidor rodará em http://localhost:9000
 ```
 
+## Funcionalidades
 
-### Build the app for production
-```bash
-quasar build
-```
+- Gerenciamento de Projetos
+- Listagem e Criação de Tarefas
+- Filtros Dinâmicos
+- Responsividade
 
-### Customize the configuration
-See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
+## Tecnologias
+
+- Vue 3
+- Quasar
+- TypeScript
+- Axios
+- Pinia

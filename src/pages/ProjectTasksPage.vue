@@ -2,6 +2,65 @@
   <q-page padding>
     <h1 class="text-h4 q-mb-md">Tarefas do Projeto: {{ project?.name }}</h1>
 
+    <div class="row q-col-gutter-md q-mb-md">
+      <div class="col-12 col-md-3">
+        <q-select
+          v-model="filterStatus"
+          :options="[{ label: 'Todos os Status', value: '' }, ...statusOptions]"
+          label="Filtrar por Status"
+          option-value="value"
+          option-label="label"
+          filled
+          emit-value
+          map-options
+          @update:model-value="updateFilter"
+        />
+      </div>
+
+      <div class="col-12 col-md-3">
+        <q-input
+          v-model="filterDate"
+          type="date"
+          label="Filtrar por Data"
+          filled
+          @update:model-value="updateFilter"
+        />
+      </div>
+
+      <div class="col-12 col-md-3">
+        <q-select
+          v-model="orderBy"
+          :options="[
+            { label: 'Data de Criação', value: 'created_at' },
+            { label: 'Título', value: 'title' },
+          ]"
+          label="Ordenar por"
+          option-value="value"
+          option-label="label"
+          filled
+          @update:model-value="updateFilter"
+        />
+      </div>
+
+      <div class="col-12 col-md-3">
+        <q-select
+          v-model="orderDirection"
+          :options="[
+            { label: 'Decrescente', value: 'desc' },
+            { label: 'Crescente', value: 'asc' },
+          ]"
+          label="Direção"
+          option-value="value"
+          option-label="label"
+          filled
+          @update:model-value="updateFilter"
+        />
+      </div>
+    </div>
+
+    <!-- Botão para limpar filtros -->
+    <q-btn color="secondary" label="Limpar Filtros" class="q-mb-md" @click="clearFilters" />
+
     <q-btn color="primary" label="Nova Tarefa" @click="openNewTaskDialog" class="q-mb-md" />
 
     <div v-if="loading">Carregando tarefas...</div>
@@ -194,6 +253,10 @@ const newTaskDialog = ref(false)
 const selectedTask = ref<Task | null>(null)
 const taskModalVisible = ref(false)
 const deleteConfirmationDialog = ref(false)
+const filterStatus = ref<Task['status'] | ''>('')
+const filterDate = ref<string>('')
+const orderBy = ref<'created_at' | 'title'>('created_at')
+const orderDirection = ref<'asc' | 'desc'>('desc')
 
 const statusOptions: StatusOption[] = [
   { value: 'pending', label: 'Pendente' },
@@ -216,21 +279,6 @@ const newTask = ref<NewTask>({
   project_id: projectId,
 })
 
-onMounted(async () => {
-  try {
-    const [projectResponse, tasksResponse] = await Promise.all([
-      api.get<Project>(`/projects/${projectId}`),
-      api.get<Task[]>(`/projects/${projectId}/tasks`),
-    ])
-    project.value = projectResponse.data
-    tasks.value = tasksResponse.data
-  } catch (error) {
-    console.error('Error loading project data:', error)
-  } finally {
-    loading.value = false
-  }
-})
-
 const openNewTaskDialog = () => {
   newTask.value = {
     title: '',
@@ -240,6 +288,35 @@ const openNewTaskDialog = () => {
     project_id: projectId,
   }
   newTaskDialog.value = true
+}
+
+const fetchTasks = async () => {
+  try {
+    loading.value = true
+
+    const params: Record<string, string> = {}
+
+    if (filterStatus.value) {
+      params.status = filterStatus.value
+    }
+
+    if (filterDate.value) {
+      params.created_at = filterDate.value
+    }
+
+    params.order_by = orderBy.value
+    params.order_direction = orderDirection.value
+
+    const tasksResponse = await api.get<Task[]>(`/projects/${projectId}/tasks`, {
+      params,
+    })
+
+    tasks.value = tasksResponse.data
+  } catch (error) {
+    console.error('Error fetching tasks:', error)
+  } finally {
+    loading.value = false
+  }
 }
 
 const createTask = async () => {
@@ -333,6 +410,18 @@ const confirmDeleteTask = () => {
   deleteConfirmationDialog.value = true
 }
 
+const updateFilter = () => {
+  fetchTasks()
+}
+
+const clearFilters = () => {
+  filterStatus.value = ''
+  filterDate.value = ''
+  orderBy.value = 'created_at'
+  orderDirection.value = 'desc'
+  fetchTasks()
+}
+
 const deleteTask = async () => {
   if (!selectedTask.value) return
 
@@ -348,4 +437,6 @@ const deleteTask = async () => {
     console.error('Erro ao excluir tarefa:', error)
   }
 }
+
+onMounted(fetchTasks)
 </script>
