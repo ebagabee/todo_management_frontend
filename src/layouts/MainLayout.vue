@@ -18,11 +18,18 @@
           <q-item-section> Visão Geral </q-item-section>
         </q-item>
 
+        <q-item clickable v-ripple to="/projects">
+          <q-item-section avatar>
+            <q-icon name="folder" />
+          </q-item-section>
+          <q-item-section> Projetos </q-item-section>
+        </q-item>
+
         <q-item clickable v-ripple to="/tasks">
           <q-item-section avatar>
             <q-icon name="list" />
           </q-item-section>
-          <q-item-section> Lista de Tarefas </q-item-section>
+          <q-item-section> Lista de Tarefas Gerais </q-item-section>
         </q-item>
       </q-list>
     </q-drawer>
