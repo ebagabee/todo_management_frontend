@@ -32,7 +32,15 @@
           <q-input v-model="newProject.name" label="Nome do Projeto" />
           <q-input v-model="newProject.description" type="textarea" label="Descrição" />
           <q-input v-model="newProject.start_date" type="date" label="Data de Início" />
-          <q-select v-model="newProject.status" :options="statusOptions" label="Status" />
+          <q-select
+            v-model="newProject.status"
+            :options="statusOptions"
+            label="Status"
+            option-value="value"
+            option-label="label"
+            emit-value
+            map-options
+          />
         </q-card-section>
 
         <q-card-actions align="right">
@@ -92,14 +100,27 @@ onMounted(async () => {
 })
 
 const openNewProjectDialog = () => {
+  newProject.value = {
+    name: '',
+    description: '',
+    start_date: '',
+    status: 'planning',
+  }
   newProjectDialog.value = true
 }
 
 const createProject = async () => {
   try {
-    const response = await api.post<Project>('/projects', newProject.value)
+    const projectData = {
+      name: newProject.value.name,
+      description: newProject.value.description,
+      start_date: newProject.value.start_date,
+      status: newProject.value.status,
+    }
+
+    const response = await api.post<Project>('/projects', projectData)
     projects.value.push(response.data)
-    newProject.value = { name: '', description: '', start_date: '', status: 'planning' }
+    newProjectDialog.value = false
   } catch (error) {
     console.error('Error creating project:', error)
   }
